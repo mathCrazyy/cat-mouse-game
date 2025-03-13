@@ -403,6 +403,37 @@ class Game {
     }
     
     gameOver(isWin = false) {
+        // 清空画布
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // 在画布上绘制老鼠图片
+        try {
+            // 计算图片尺寸以适应画布
+            const scale = Math.min(
+                this.canvas.width / this.images.mouse.width,
+                this.canvas.height / this.images.mouse.height
+            );
+            const width = this.images.mouse.width * scale;
+            const height = this.images.mouse.height * scale;
+            const x = (this.canvas.width - width) / 2;
+            const y = (this.canvas.height - height) / 2;
+            
+            // 绘制老鼠图片
+            this.ctx.drawImage(
+                this.images.mouse,
+                0, 0,
+                this.images.mouse.width,
+                this.images.mouse.height,
+                x, y, width, height
+            );
+            
+            // 添加半透明遮罩
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        } catch (error) {
+            console.error('绘制游戏结束画面时出错:', error);
+        }
+        
         this.finalScoreElement.textContent = this.score;
         this.gameOverElement.style.display = 'block';
         
@@ -412,16 +443,10 @@ class Game {
         // 移除鼠标事件监听
         this.canvas.removeEventListener('mousemove', this.handleMouseMove);
         
-        // 设置背景
-        const gameContainer = document.getElementById('gameContainer');
-        const gameOverBackground = document.getElementById('gameOverBackground');
-        
-        // 添加game-over类
-        gameContainer.classList.add('game-over');
-        
-        // 设置背景图片
-        gameOverBackground.style.backgroundImage = `url(${this.basePath}images/mouse.png)`;
-        gameOverBackground.style.display = 'block';
+        // 清除所有游戏对象
+        this.bombs = [];
+        this.cat = null;
+        this.mouse = null;
         
         // 更新游戏结束标题
         const gameOverTitle = document.querySelector('#gameOver h2');
