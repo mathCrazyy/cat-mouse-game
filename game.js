@@ -17,6 +17,12 @@ class Game {
         // 获取仓库基础路径
         this.basePath = window.location.pathname.includes('/cat-mouse-game') ? '/cat-mouse-game/' : '/';
         
+        // 设置联系方式图片路径
+        const contactImage = document.querySelector('#contactSection img');
+        if (contactImage) {
+            contactImage.src = this.basePath + 'images/person.jpg';
+        }
+        
         // 速度控制元素
         this.catSpeedInput = document.getElementById('catSpeed');
         this.mouseSpeedInput = document.getElementById('mouseSpeed');
