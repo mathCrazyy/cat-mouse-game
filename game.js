@@ -10,6 +10,9 @@ class Game {
         this.gameOverElement = document.getElementById('gameOver');
         this.finalScoreElement = document.getElementById('finalScore');
         
+        // 获取仓库基础路径
+        this.basePath = window.location.pathname.includes('/cat-mouse-game') ? '/cat-mouse-game/' : '/';
+        
         // 速度控制元素
         this.catSpeedInput = document.getElementById('catSpeed');
         this.mouseSpeedInput = document.getElementById('mouseSpeed');
@@ -53,7 +56,8 @@ class Game {
                 };
                 
                 console.log(`开始加载图片: ${src}`);
-                img.src = src;
+                // 添加仓库路径前缀
+                img.src = this.basePath + src;
             });
         };
         
