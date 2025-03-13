@@ -4,8 +4,12 @@ class Game {
         this.ctx = this.canvas.getContext('2d');
         this.score = 0;
         this.lives = 5;
+        this.level = 1;  // 当前关卡
+        this.catchCount = 0;  // 抓住老鼠的次数
         this.scoreElement = document.getElementById('scoreValue');
         this.livesElement = document.getElementById('livesValue');
+        this.levelElement = document.getElementById('levelValue');
+        this.catchCountElement = document.getElementById('catchCountValue');
         this.loadingElement = document.getElementById('loading');
         this.gameOverElement = document.getElementById('gameOver');
         this.finalScoreElement = document.getElementById('finalScore');
@@ -24,6 +28,28 @@ class Game {
             cat: { width: 80, height: 80 },
             mouse: { width: 40, height: 40 },
             bomb: { width: 30, height: 30 }
+        };
+        
+        // 关卡配置
+        this.levelConfig = {
+            1: {
+                bombMovement: 'up',  // 炸弹向上移动
+                bombInterval: 2000,   // 每2秒生成一个炸弹
+                bombSpeed: 2,
+                maxBombs: 3          // 最多3个炸弹
+            },
+            2: {
+                bombMovement: 'radial',  // 炸弹向外扩散
+                bombInterval: 1500,      // 每1.5秒生成一个炸弹
+                bombSpeed: 3,
+                maxBombs: 5             // 最多5个炸弹
+            },
+            3: {
+                bombMovement: 'radial',  // 炸弹向外扩散
+                bombInterval: 1000,      // 每1秒生成一个炸弹
+                bombSpeed: 4,
+                maxBombs: 10            // 最多10个炸弹
+            }
         };
         
         // 加载图片
@@ -136,10 +162,8 @@ class Game {
             originalHeight: this.images.bomb.height
         };
         
-        // 炸弹数组
-        this.bombs = [];
-        this.lastBombTime = 0;
-        this.bombInterval = 2000; // 每2秒生成一个炸弹
+        // 初始化关卡
+        this.initLevel(this.level);
         
         // 绑定速度控制事件
         this.catSpeedInput.addEventListener('input', () => {
@@ -185,6 +209,29 @@ class Game {
         requestAnimationFrame(this.gameLoop);
     }
     
+    initLevel(level) {
+        console.log(`初始化第 ${level} 关`);
+        this.level = level;
+        this.levelElement.textContent = level;
+        this.bombInterval = this.levelConfig[level].bombInterval;
+        this.bombMovement = this.levelConfig[level].bombMovement;
+        this.bombSpeed = this.levelConfig[level].bombSpeed;
+        this.maxBombs = this.levelConfig[level].maxBombs;
+        this.bombs = [];
+        this.lastBombTime = 0;
+
+        // 显示关卡提示
+        const levelMessage = document.createElement('div');
+        levelMessage.className = 'level-message';
+        levelMessage.textContent = `第 ${level} 关！`;
+        document.body.appendChild(levelMessage);
+        
+        // 3秒后移除提示
+        setTimeout(() => {
+            levelMessage.remove();
+        }, 3000);
+    }
+    
     handleMouseMove(event) {
         const rect = this.canvas.getBoundingClientRect();
         const mouseX = event.clientX - rect.left;
@@ -196,15 +243,35 @@ class Game {
     }
     
     createBomb() {
-        return {
-            x: Math.random() * (this.canvas.width - this.bombSize.width),
-            y: this.canvas.height,
-            width: this.bombSize.width,
-            height: this.bombSize.height,
-            speed: 2,
-            originalWidth: this.bombSize.originalWidth,
-            originalHeight: this.bombSize.originalHeight
-        };
+        if (this.level === 1) {
+            return {
+                x: Math.random() * (this.canvas.width - this.bombSize.width),
+                y: this.canvas.height,
+                width: this.bombSize.width,
+                height: this.bombSize.height,
+                speed: this.bombSpeed,
+                originalWidth: this.bombSize.originalWidth,
+                originalHeight: this.bombSize.originalHeight,
+                dx: 0,
+                dy: -1  // 向上移动
+            };
+        } else {
+            // 第二关：炸弹从中心向外扩散
+            const centerX = this.canvas.width / 2;
+            const centerY = this.canvas.height / 2;
+            const angle = Math.random() * Math.PI * 2;  // 随机角度
+            return {
+                x: centerX,
+                y: centerY,
+                width: this.bombSize.width,
+                height: this.bombSize.height,
+                speed: this.bombSpeed,
+                originalWidth: this.bombSize.originalWidth,
+                originalHeight: this.bombSize.originalHeight,
+                dx: Math.cos(angle),  // x方向速度分量
+                dy: Math.sin(angle)   // y方向速度分量
+            };
+        }
     }
     
     update(deltaTime) {
@@ -213,15 +280,25 @@ class Game {
         
         // 生成炸弹
         const now = Date.now();
-        if (now - this.lastBombTime > this.bombInterval) {
+        if (now - this.lastBombTime > this.bombInterval && this.bombs.length < this.maxBombs) {
             this.bombs.push(this.createBomb());
             this.lastBombTime = now;
         }
         
         // 更新炸弹位置
         this.bombs = this.bombs.filter(bomb => {
-            bomb.y -= bomb.speed * speedMultiplier;
-            return bomb.y > -bomb.height; // 移除超出屏幕的炸弹
+            if (this.level === 1) {
+                bomb.y += bomb.dy * bomb.speed * speedMultiplier;
+                return bomb.y > -bomb.height;  // 移除超出屏幕的炸弹
+            } else {
+                bomb.x += bomb.dx * bomb.speed * speedMultiplier;
+                bomb.y += bomb.dy * bomb.speed * speedMultiplier;
+                // 当炸弹移出画布时移除
+                return bomb.x > -bomb.width && 
+                       bomb.x < this.canvas.width + bomb.width && 
+                       bomb.y > -bomb.height && 
+                       bomb.y < this.canvas.height + bomb.height;
+            }
         });
         
         // 更新老鼠的目标位置
@@ -254,13 +331,45 @@ class Game {
         if (catDistance < (this.cat.width + this.mouse.width) / 3) {
             // 抓到老鼠
             this.score += 10;
+            this.catchCount++;
             this.scoreElement.textContent = this.score;
+            this.catchCountElement.textContent = this.catchCount;
             
-            // 重置老鼠位置
+            // 每抓到10只老鼠
+            if (this.catchCount % 10 === 0) {
+                // 奖励1条生命
+                this.lives++;
+                this.livesElement.textContent = this.lives;
+                
+                // 猫变大1.1倍
+                this.cat.width *= 1.1;
+                this.cat.height *= 1.1;
+
+                // 增加惩罚：老鼠速度增加
+                this.mouse.speed = Math.min(10, this.mouse.speed + 1);
+                this.mouseSpeedInput.value = this.mouse.speed;
+                this.mouseSpeedValue.textContent = this.mouse.speed;
+            }
+            
+            // 关卡进度
+            if (this.level === 1 && this.catchCount >= 20) {
+                this.initLevel(2);
+                // 更新UI提示
+                this.catchCountElement.parentElement.style.display = 'none';
+            } else if (this.level === 2 && this.catchCount >= 40) {
+                this.initLevel(3);
+            }
+            
+            // 重置老鼠位置并增加惩罚
             this.mouse.x = Math.random() * (this.canvas.width - this.mouse.width);
             this.mouse.y = Math.random() * (this.canvas.height - this.mouse.height);
             this.mouse.targetX = this.mouse.x;
             this.mouse.targetY = this.mouse.y;
+            
+            // 惩罚：生成额外的炸弹
+            if (this.bombs.length < this.maxBombs) {
+                this.bombs.push(this.createBomb());
+            }
         }
         
         // 检测与炸弹的碰撞

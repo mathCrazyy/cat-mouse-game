@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>猫爪老鼠游戏</title>
+    <title>猫抓老鼠游戏</title>
     <style>
         body {
             margin: 0;
@@ -34,6 +34,20 @@
             left: 10px;
             font-size: 20px;
             color: #333;
+        }
+        #level {
+            position: absolute;
+            top: 70px;
+            left: 10px;
+            font-size: 20px;
+            color: #333;
+        }
+        #catchCount {
+            position: absolute;
+            top: 100px;
+            left: 10px;
+            font-size: 16px;
+            color: #666;
         }
         #loading {
             position: absolute;
@@ -96,6 +110,52 @@
             min-width: 40px;
             font-size: 14px;
         }
+        .level-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 32px;
+            animation: fadeInOut 3s ease-in-out;
+            z-index: 1000;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            10% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            20% { transform: translate(-50%, -50%) scale(1); }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        #contactSection {
+            position: absolute;
+            left: 820px;  /* 游戏画布宽度 + 20px 间距 */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 200px;
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #contactSection img {
+            width: 180px;
+            height: 180px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+        #contactSection p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0 10px;
+        }
     </style>
 </head>
 <body>
@@ -103,6 +163,8 @@
         <canvas id="gameCanvas" width="800" height="600"></canvas>
         <div id="score">得分: <span id="scoreValue">0</span></div>
         <div id="lives">生命: <span id="livesValue">5</span></div>
+        <div id="level">关卡: <span id="levelValue">1</span></div>
+        <div id="catchCount">抓到老鼠: <span id="catchCountValue">0</span>/20</div>
         <div id="loading">加载中...</div>
         <div id="gameOver">
             <h2>游戏结束</h2>
@@ -118,6 +180,10 @@
                 <label>老鼠速度: <span id="mouseSpeedValue">3</span></label>
                 <input type="range" id="mouseSpeed" min="1" max="10" value="3">
             </div>
+        </div>
+        <div id="contactSection">
+            <img src="images/person.jpg" alt="联系方式">
+            <p>欢迎添加，免费接任何简易需求(能力范围内)，也欢迎为游戏提出您的想法，您就是甲方</p>
         </div>
     </div>
     <script src="game.js"></script>
