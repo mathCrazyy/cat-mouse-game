@@ -17,12 +17,6 @@ class Game {
         // 获取仓库基础路径
         this.basePath = window.location.pathname.includes('/cat-mouse-game') ? '/cat-mouse-game/' : '/';
         
-        // 设置联系方式图片路径
-        const contactImage = document.querySelector('#contactSection img');
-        if (contactImage) {
-            contactImage.src = this.basePath + 'images/person.jpg';
-        }
-        
         // 速度控制元素
         this.catSpeedInput = document.getElementById('catSpeed');
         this.mouseSpeedInput = document.getElementById('mouseSpeed');
@@ -62,7 +56,8 @@ class Game {
         this.images = {
             cat: new Image(),
             mouse: new Image(),
-            bomb: new Image()
+            bomb: new Image(),
+            contact: new Image()  // 添加联系方式图片
         };
         
         // 设置图片加载超时
@@ -88,7 +83,6 @@ class Game {
                 };
                 
                 console.log(`开始加载图片: ${src}`);
-                // 添加仓库路径前缀
                 img.src = this.basePath + src;
             });
         };
@@ -103,11 +97,17 @@ class Game {
         Promise.all([
             loadImage(this.images.cat, 'images/cat.png'),
             loadImage(this.images.mouse, 'images/mouse.png'),
-            loadImage(this.images.bomb, 'images/bomb.png')
+            loadImage(this.images.bomb, 'images/bomb.png'),
+            loadImage(this.images.contact, 'images/person.jpg')  // 加载联系方式图片
         ]).then(() => {
             updateLoadingStatus('游戏加载完成！');
             setTimeout(() => {
                 this.loadingElement.style.display = 'none';
+                // 设置联系方式图片
+                const contactImage = document.querySelector('#contactSection img');
+                if (contactImage) {
+                    contactImage.src = this.images.contact.src;
+                }
                 this.startGame();
             }, 500);
         }).catch(error => {
