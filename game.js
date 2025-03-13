@@ -412,6 +412,17 @@ class Game {
         // 移除鼠标事件监听
         this.canvas.removeEventListener('mousemove', this.handleMouseMove);
         
+        // 设置背景
+        const gameContainer = document.getElementById('gameContainer');
+        const gameOverBackground = document.getElementById('gameOverBackground');
+        
+        // 添加game-over类
+        gameContainer.classList.add('game-over');
+        
+        // 设置背景图片
+        gameOverBackground.style.backgroundImage = `url(${this.basePath}images/mouse.png)`;
+        gameOverBackground.style.display = 'block';
+        
         // 更新游戏结束标题
         const gameOverTitle = document.querySelector('#gameOver h2');
         if (isWin) {
