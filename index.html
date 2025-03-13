@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>猫爪老鼠游戏</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #gameContainer {
+            position: relative;
+        }
+        #gameCanvas {
+            border: 2px solid #333;
+            background-color: #fff;
+        }
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            color: #333;
+        }
+        #lives {
+            position: absolute;
+            top: 40px;
+            left: 10px;
+            font-size: 20px;
+            color: #333;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #333;
+        }
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+        #gameOver h2 {
+            margin: 0 0 20px 0;
+            color: #ff4444;
+        }
+        #gameOver button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #gameOver button:hover {
+            background: #45a049;
+        }
+        #controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .control-group {
+            margin: 5px 0;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 2px;
+            font-size: 14px;
+        }
+        .control-group input[type="range"] {
+            width: 150px;
+        }
+        .control-group span {
+            display: inline-block;
+            min-width: 40px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="score">得分: <span id="scoreValue">0</span></div>
+        <div id="lives">生命: <span id="livesValue">5</span></div>
+        <div id="loading">加载中...</div>
+        <div id="gameOver">
+            <h2>游戏结束</h2>
+            <p>最终得分: <span id="finalScore">0</span></p>
+            <button onclick="location.reload()">重新开始</button>
+        </div>
+        <div id="controls">
+            <div class="control-group">
+                <label>猫的速度: <span id="catSpeedValue">5</span></label>
+                <input type="range" id="catSpeed" min="1" max="15" value="5">
+            </div>
+            <div class="control-group">
+                <label>老鼠速度: <span id="mouseSpeedValue">3</span></label>
+                <input type="range" id="mouseSpeed" min="1" max="10" value="3">
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html> 
