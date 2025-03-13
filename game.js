@@ -358,6 +358,10 @@ class Game {
                 this.catchCountElement.parentElement.style.display = 'none';
             } else if (this.level === 2 && this.catchCount >= 40) {
                 this.initLevel(3);
+            } else if (this.level === 3 && this.catchCount >= 60) {
+                // 通关游戏
+                this.gameOver(true);
+                return;
             }
             
             // 重置老鼠位置并增加惩罚
@@ -391,15 +395,32 @@ class Game {
                 
                 // 检查游戏是否结束
                 if (this.lives <= 0) {
-                    this.gameOver();
+                    this.gameOver(false);
+                    return;  // 立即停止更新
                 }
             }
         }
     }
     
-    gameOver() {
+    gameOver(isWin = false) {
         this.finalScoreElement.textContent = this.score;
         this.gameOverElement.style.display = 'block';
+        
+        // 停止游戏循环
+        cancelAnimationFrame(this.gameLoop);
+        
+        // 移除鼠标事件监听
+        this.canvas.removeEventListener('mousemove', this.handleMouseMove);
+        
+        // 更新游戏结束标题
+        const gameOverTitle = document.querySelector('#gameOver h2');
+        if (isWin) {
+            gameOverTitle.textContent = '恭喜通关！';
+            gameOverTitle.style.color = '#4CAF50';
+        } else {
+            gameOverTitle.textContent = '游戏结束';
+            gameOverTitle.style.color = '#ff4444';
+        }
     }
     
     draw() {
